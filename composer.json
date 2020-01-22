@@ -13,10 +13,11 @@
         "neoan3-apps/db": "^0",
         "php": "^7.0",
         "ext-json": "*",
+        "ext-mbstring": "*",
         "neoan3-apps/stateless": "^1.0"
     },
     "scripts": {
-        "post-update-cmd": [
+        "post-install-cmd": [
             "php  \"install.php\" "
         ]
     },
