@@ -73,11 +73,11 @@ class Vastn3 extends Serve
     }
     private function setup(){
         // stateless
-        Stateless::setSecret($this->credentials['blua_stateless']['secret']);
+        Stateless::setSecret($this->credentials['salts']['vastn3']);
 
         // db
         try{
-            Db::setEnvironment($this->credentials['fundraiser_db']);
+            Db::setEnvironment($this->credentials['vastn3_db']);
         } catch (DbException $e) {
             print('database currently unavailable');
         }
