@@ -9,7 +9,8 @@
         "neoan3-apps/ops": "^1",
         "neoan3-apps/db": "^0.2.1",
         "neoan3-model/index": "^0.0.1",
-        "neoan3-apps/transformer": "^1"
+        "neoan3-apps/transformer": "^1",
+        "neoan3-apps/stateless": "^1"
     },
     "license": "MIT",
     "authors": [
