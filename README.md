@@ -27,6 +27,4 @@ vast-n3 is a bootstrapping project setting up
  
  Then run our installation script:
  
- `neoan3 install https://raw.githubusercontent.com/vast-n3/start/master/install.php`
- 
- 
+ `neoan3 install https://neoan.us/vast-n3/master/`
