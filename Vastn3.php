@@ -7,22 +7,25 @@ use Neoan3\Apps\Db;
 use Neoan3\Apps\DbException;
 use Neoan3\Apps\Stateless;
 use Neoan3\Core\Serve;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class Vastn3 extends Serve
 {
     private $credentials = [];
+    private $loadedComponents = [];
+
     function __construct()
     {
         parent::__construct();
-        if($_SERVER['HTTP_HOST'] == 'localhost'){
+        if ($_SERVER['HTTP_HOST'] == 'localhost') {
             $this->includeJs(base . 'node_modules/vue/dist/vue.js');
         } else {
             $this->includeJs(base . 'node_modules/vue/dist/vue.min.js');
         }
-        try{
+        try {
             $this->credentials = getCredentials();
-        } catch (\Exception $e){
-            print('SETUP: No credentials found. Please check README for instructions and/or change '.__FILE__.' starting at line '.(__LINE__-4).' ');
+        } catch (\Exception $e) {
+            print('SETUP: No credentials found. Please check README for instructions and/or change ' . __FILE__ . ' starting at line ' . (__LINE__ - 4) . ' ');
             die();
         }
         // default header
@@ -30,57 +33,93 @@ class Vastn3 extends Serve
         $this->hook('header', 'header');
         $this->setup();
     }
+
     function constants()
     {
         return [
             'base' => [base],
+            'meta' => [
+                ['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1.0']
+            ],
             'stylesheet' => [base . 'frame/vastn3/style.css'],
             'js' => [
                 ['src' => base . 'node_modules/axios/dist/axios.min.js'],
-                ['src' => base . 'frame/vastn3/main.js', 'data'=>['base'=>base]]
+                ['src' => base . 'node_modules/lodash/lodash.min.js'],
+                ['src' => base . 'frame/vastn3/main.js', 'data' => ['base' => base]]
             ]
         ];
     }
+
     // vuejs integration
-    function output($params = []) {
+    function output($params = [])
+    {
         $this->js .= 'new Vue({el:"#root"});';
         $this->main = '<div id="root" class="main">' . $this->header . $this->main . '</div>';
         $this->header = '';
         parent::output($params);
     }
+
     function vueComponents($components, $params = [])
     {
-        foreach ($components as $component){
+        foreach ($components as $component) {
             $this->vueComponent($component, $params);
         }
         return $this;
     }
-    function vueComponent($element, $params = []) {
+
+    function vueComponent($element, $params = [])
+    {
+        if(in_array($element,$this->loadedComponents)){
+            return $this;
+        }
+        $this->loadedComponents[] = $element;
         $params['base'] = base;
         $path = path . '/component/' . $element . '/' . $element . '.ce.';
-        if(file_exists($path . $this->viewExt)) {
+        if (file_exists($path . $this->viewExt)) {
             $this->footer .= '<template id="' . $element . '">' . $this->fileContent($path . $this->viewExt, $params) .
                 '</template>';
         }
-        if(file_exists($path . $this->styleExt)) {
+        if (file_exists($path . $this->styleExt)) {
             $this->style .= $this->fileContent($path . $this->styleExt, $params);
         }
-        if(file_exists($path . 'js')) {
+        if (file_exists($path . 'js')) {
             $this->js .= $this->fileContent($path . 'js', $params);
+        }
+        // dependencies?
+        $phpCtrl = path . '/component/' . $element . '/' . ucfirst($element) . '.ctrl.php';
+        if (file_exists($phpCtrl)) {
+            $class = '\\Neoan3\\Components\\' . ucfirst($element);
+            if (method_exists($class, 'dependencies')) {
+                $dependencies = "$class::dependencies";
+                $this->vueComponents($dependencies(), $params);
+            }
         }
 
         return $this;
     }
-    private function setup(){
+
+    function newEmail()
+    {
+        $wrapper = new PHPMailer(true);
+        $wrapper->isSMTP();
+        $wrapper->isHTML(true);
+        foreach (getCredentials()['vastn3_mail'] as $property => $value){
+            $wrapper->$property = $value;
+        }
+        return $wrapper;
+
+    }
+
+    private function setup()
+    {
         // stateless
         Stateless::setSecret($this->credentials['salts']['vastn3']);
 
         // db
-        try{
+        try {
             Db::setEnvironment($this->credentials['vastn3_db']);
         } catch (DbException $e) {
             print('database currently unavailable');
         }
-
     }
 }
