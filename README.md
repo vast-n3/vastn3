@@ -28,3 +28,11 @@ vast-n3 is a bootstrapping project setting up
  Then run our installation script:
  
  `neoan3 install https://neoan.us/vast-n3/master/`
+ 
+ Setup credentials:
+ 
+ `php setup.php`
+ 
+ Migrate models:
+ 
+ `neoan3 migrate models up`
