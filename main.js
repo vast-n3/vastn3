@@ -17,9 +17,16 @@ const session = {
         return {
             token: localStorage.token,
             validThrough: localStorage.validThrough,
-            user: localStorage.user,
+            user: {},
             expiration: new Date(Number(localStorage.validThrough))
         }
+    },
+    created(){
+      try{
+          this.user = JSON.parse(localStorage.user);
+      } catch (e) {
+          this.user = {}
+      }
     },
     methods: {
         refreshToken: function(){
