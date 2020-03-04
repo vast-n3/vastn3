@@ -5,7 +5,7 @@ let config = {
     headers: {'X-Custom-Header': 'foobar'}
 };
 if(localStorage.token){
-    config.headers.Authorization = `Bearer ${localStorage.token}`;
+    config.headers.Authorization = `Bearer ${localStorage.token.replace('"','')}`;
 }
 
 const api = axios.create(config);
