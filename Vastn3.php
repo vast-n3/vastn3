@@ -43,9 +43,9 @@ class Vastn3 extends Serve
             ],
             'stylesheet' => [base . 'frame/vastn3/style.css'],
             'js' => [
-                ['src' => base . 'node_modules/axios/dist/axios.min.js'],
-                ['src' => base . 'node_modules/lodash/lodash.min.js'],
-                ['src' => base . 'frame/vastn3/main.js', 'data' => ['base' => base]]
+                ['src' => path . '/node_modules/axios/dist/axios.min.js', 'data'=>['base' => base]],
+                ['src' => 'https://cdn.jsdelivr.net/npm/lodash@latest/lodash.min.js'],
+                ['src' => path . '/frame/vastn3/main.js', 'data' => ['base' => base]]
             ]
         ];
     }
